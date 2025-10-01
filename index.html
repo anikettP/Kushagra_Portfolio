@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kushagra Chandrayan | Portfolio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Chakra+Petch:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --dark-navy: #020c1b; /* Darker theme */
+            --light-navy: #112240;
+            --lightest-navy: #233554;
+            --slate: #8892b0;
+            --light-slate: #a8b2d1;
+            --lightest-slate: #ccd6f6;
+            --white: #e6f1ff;
+            --cyan: #64ffda;
+            --pink: #f57dff;
+            --blue: #57cbff;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--dark-navy);
+            color: var(--light-slate);
+            overflow-x: hidden;
+            cursor: none; /* Hide default cursor */
+        }
+
+        /* Custom Cursor & Trail */
+        .cursor {
+            width: 30px;
+            height: 30px;
+            border: 2px solid var(--cyan);
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            z-index: 10001;
+            transition: transform 0.2s ease-out, width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
+        }
+        .cursor.hover {
+            width: 50px;
+            height: 50px;
+            background-color: rgba(100, 255, 218, 0.1);
+        }
+        .trail {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background-color: var(--cyan);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transform: translate(-50%, -50%);
+            transition: opacity 0.3s ease-out;
+        }
+
+        /* Preloader */
+        #preloader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark-navy); display: flex; justify-content: center;
+            align-items: center; z-index: 10000; transition: opacity 0.5s ease;
+        }
+        .loader {
+            width: 50px; height: 50px; border: 5px solid var(--lightest-navy);
+            border-top-color: var(--cyan); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Dynamic Background */
+        #background-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+        
+        /* Glassmorphism Effect */
+        .glass-effect, .interactive-card {
+            background: rgba(17, 34, 64, 0.6);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem; position: relative; z-index: 2;
+        }
+        
+        .nav-link.active { color: var(--cyan); }
+
+        .gradient-text {
+            background: -webkit-linear-gradient(45deg, var(--cyan), var(--blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .section-title {
+            font-family: 'Chakra Petch', sans-serif;
+        }
+        .section-title::after {
+            content: ''; display: inline-block; position: relative; top: -0.5em;
+            width: clamp(100px, 25vw, 300px); height: 1px; margin-left: 20px;
+            background-color: var(--lightest-navy);
+        }
+        
+        .scroll-fade { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+        .scroll-fade.visible { opacity: 1; transform: translateY(0); }
+        
+        .tag { background-color: rgba(100, 255, 218, 0.1); color: var(--cyan); }
+        
+        .timeline-item::before { content: ''; position: absolute; left: -30px; top: 5px; width: 20px; height: 20px; border-radius: 50%; background-color: var(--cyan); border: 3px solid var(--dark-navy); }
+        
+        #typed-text::after { content: '|'; color: var(--cyan); animation: blink 1s step-end infinite; }
+        @keyframes blink { from, to { opacity: 1; } 50% { opacity: 0; } }
+        
+        .social-sidebar { position: fixed; bottom: 0; left: 40px; display: none; z-index: 10; }
+        @media (min-width: 1024px) { .social-sidebar { display: block; } }
+        .social-sidebar ul::after { content: ''; display: block; width: 1px; height: 90px; margin: 0 auto; background-color: var(--light-slate); }
+
+        /* NCC Section Theming */
+        #ncc-journey {
+            position: relative;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            padding: 2px;
+            background: linear-gradient(45deg, #303c2a, #1a2018);
+        }
+        .ncc-card {
+            background: #1a2018;
+            border: none;
+        }
+        #ncc-journey::before {
+             content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(45deg, rgba(0,0,0,0.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.1) 75%),
+                linear-gradient(-45deg, rgba(0,0,0,0.1) 25%, transparent 25%, transparent 75%, rgba(0,0,0,0.1) 75%);
+            background-size: 60px 60px;
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        /* Pixel Transition */
+        .pixel-transition-container {
+            position: relative;
+            overflow: hidden;
+        }
+        .pixel-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            grid-template-rows: repeat(12, 1fr);
+        }
+        .pixel {
+            background-color: var(--cyan);
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+        .pixel-transition-container:hover .pixel {
+            opacity: 0;
+        }
+
+    </style>
+</head>
+<body class="leading-relaxed">
+    <div id="preloader">
+        <div class="loader"></div>
+    </div>
+    <div class="cursor"></div>
+    
+    <canvas id="background-canvas"></canvas>
+    
+    <!-- Header & Navigation -->
+    <header id="header" class="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center glass-effect mt-4">
+            <a href="#" class="text-2xl font-bold" style="color: var(--cyan);">KC</a>
+            <div id="nav-links" class="hidden md:flex space-x-8 items-center text-sm">
+                <a href="#about" class="nav-link hover:text-cyan-400 transition duration-300">About</a>
+                <a href="#ncc-journey" class="nav-link hover:text-cyan-400 transition duration-300">NCC Journey</a>
+                <a href="#experience" class="nav-link hover:text-cyan-400 transition duration-300">Experience</a>
+                <a href="#projects" class="nav-link hover:text-cyan-400 transition duration-300">Projects</a>
+                <a href="#toolkit" class="nav-link hover:text-cyan-400 transition duration-300">Toolkit</a>
+                <a href="#achievements" class="nav-link hover:text-cyan-400 transition duration-300">Achievements</a>
+                <a href="Kushagra resume.pdf" download class="nav-link border border-cyan-400 text-cyan-400 px-4 py-2 rounded-md hover:bg-cyan-400 hover:text-slate-900 transition duration-300">Resume</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-2xl"><i class="fas fa-bars"></i></button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4 glass-effect">
+            <a href="#about" class="block py-2 hover:text-cyan-400">About</a>
+            <a href="#ncc-journey" class="block py-2 hover:text-cyan-400">NCC Journey</a>
+            <a href="#experience" class="block py-2 hover:text-cyan-400">Experience</a>
+            <a href="#projects" class="block py-2 hover:text-cyan-400">Projects</a>
+            <a href="#toolkit" class="block py-2 hover:text-cyan-400">Toolkit</a>
+            <a href="#achievements" class="block py-2 hover:text-cyan-400">Achievements</a>
+            <a href="Kushagra resume.pdf" download class="block mt-2 border border-cyan-400 text-cyan-400 px-4 py-2 rounded-md text-center">Resume</a>
+        </div>
+    </header>
+    
+    <div class="social-sidebar">
+        <ul class="flex flex-col items-center space-y-6">
+            <li><a href="#" class="text-slate-400 hover:text-cyan-400 transition-all duration-300 hover:transform hover:-translate-y-1"><i class="fab fa-github text-xl"></i></a></li>
+            <li><a href="#" class="text-slate-400 hover:text-cyan-400 transition-all duration-300 hover:transform hover:-translate-y-1"><i class="fab fa-linkedin-in text-xl"></i></a></li>
+            <li><a href="mailto:chandrayan04@gmail.com" class="text-slate-400 hover:text-cyan-400 transition-all duration-300 hover:transform hover:-translate-y-1"><i class="fas fa-envelope text-xl"></i></a></li>
+            <li><a href="tel:+918000149295" class="text-slate-400 hover:text-cyan-400 transition-all duration-300 hover:transform hover:-translate-y-1"><i class="fas fa-phone text-xl"></i></a></li>
+        </ul>
+    </div>
+
+    <main class="container mx-auto px-6 md:px-16 lg:px-24 pt-24 relative z-10">
+        <section id="hero" class="min-h-screen flex flex-col justify-center scroll-fade">
+            <h1 class="text-lg text-cyan-400 mb-4">Hi, my name is</h1>
+            <h2 class="text-4xl md:text-7xl font-bold text-slate-100 gradient-text">Kushagra Chandrayan.</h2>
+            <h3 class="text-4xl md:text-7xl font-bold text-slate-400 mt-2">I build <span id="typed-text" class="text-cyan-300"></span></h3>
+            <p class="mt-6 max-w-xl text-slate-400">I'm an Electronics and Communication Engineering student with a passion for embedded systems, IoT, and circuit design. I enjoy creating innovative solutions that bridge the gap between hardware and software.</p>
+            <div class="mt-8 flex flex-wrap gap-4">
+                <a href="#contact" class="border-2 border-cyan-400 text-cyan-400 text-lg px-8 py-4 rounded-md hover:bg-cyan-400/10 transition duration-300">Get In Touch</a>
+                <a href="Kushagra resume.pdf" download class="border-2 border-cyan-400 text-cyan-400 text-lg px-8 py-4 rounded-md hover:bg-cyan-400/10 transition duration-300">Download Resume</a>
+            </div>
+        </section>
+
+        <section id="about" class="py-24 scroll-fade">
+            <h2 class="section-title text-3xl font-bold text-slate-200 flex items-center"><span class="text-cyan-400 mr-2 text-2xl">01.</span> About Me</h2>
+            <div class="mt-8 grid grid-cols-1 md:grid-cols-5 gap-12 items-center">
+                <div class="md:col-span-3 text-slate-400 space-y-4">
+                    <p data-scramble-text>Hello! I'm Kushagra, an aspiring engineer deeply fascinated by the world of electronics. My journey began with simple Arduino projects and has since evolved into exploring complex domains like wireless network security, IoT, and industrial automation.</p>
+                    <p data-scramble-text>My goal is to leverage my skills to build efficient and impactful technological solutions. Parallel to my technical pursuits, I am a dedicated and active NCC Cadet, a commitment that has instilled in me a strong sense of discipline, leadership, and teamwork.</p>
+                </div>
+                <div class="md:col-span-2 flex justify-center">
+                    <div class="w-64 h-64 md:w-72 md:h-72 rounded-lg bg-cyan-400/10 relative group interactive-card p-2 pixel-transition-container">
+                        <img src="kushagra.jpg" alt="Kushagra Chandrayan" class="rounded-lg w-full h-full object-cover">
+                        <div class="pixel-overlay"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="ncc-journey" class="py-24 scroll-fade">
+            <h2 class="section-title text-3xl font-bold text-slate-200 flex items-center"><span class="text-cyan-400 mr-2 text-2xl">02.</span> NCC Journey</h2>
+            <div class="mt-12 interactive-card ncc-card p-8">
+                <p class="text-slate-300 leading-relaxed relative z-10">Kushagra Chandrayan holds the NCC “B” Certificate and has actively participated in two Combined Annual Training Camps at Bhilwara and Udaipur. He was selected for the NCC Innovation Program, representing the Udaipur Directorate at the national level in Vijayawada, Andhra Pradesh. His journey reflects a strong commitment to discipline, leadership, and innovation in line with the NCC motto <strong class="text-cyan-400">“Unity and Discipline.”</strong></p>
+            </div>
+        </section>
+
+        <section id="experience" class="py-24 scroll-fade">
+            <h2 class="section-title text-3xl font-bold text-slate-200 flex items-center"><span class="text-cyan-400 mr-2 text-2xl">03.</span> Experience & Training</h2>
+            <div class="mt-12 relative border-l-2 border-slate-700 ml-4 pl-8">
+                <div class="mb-12 timeline-item"><h3 class="text-xl font-semibold text-slate-200">Training, North Western Railway</h3><p class="text-sm text-cyan-400 mb-2">Signal & Telecommunication Dept, Ajmer Division</p><p class="text-slate-400">Learned about railway signal interlocking, intercommunication networks, and optical fiber communication.</p></div>
+                <div class="mb-12 timeline-item"><h3 class="text-xl font-semibold text-slate-200">Training, RRVPNL, Ajmer</h3><p class="text-sm text-cyan-400 mb-2">220 KV Grid Substation</p><p class="text-slate-400">Gained practical knowledge of power transmission, grid monitoring, and various protection systems.</p></div>
+                <div class="timeline-item"><h3 class="text-xl font-semibold text-slate-200">Workshop, Industrial Automation</h3><p class="text-sm text-cyan-400 mb-2">PLC & SCADA</p><p class="text-slate-400">Acquired hands-on experience in automation using Programmable Logic Controllers (PLC) and SCADA systems.</p></div>
+            </div>
+        </section>
+
+        <section id="projects" class="py-24 scroll-fade">
+            <h2 class="section-title text-3xl font-bold text-slate-200 flex items-center"><span class="text-cyan-400 mr-2 text-2xl">04.</span> Things I've Built</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+                <div class="interactive-card p-6 flex flex-col justify-between"><div><div class="flex justify-between items-center mb-4"><i class="fas fa-folder-open text-3xl text-cyan-400"></i><div class="space-x-4"><a href="#" class="text-slate-400 hover:text-cyan-400"><i class="fab fa-github text-xl"></i></a><a href="#" class="text-slate-400 hover:text-cyan-400"><i class="fas fa-external-link-alt text-xl"></i></a></div></div><h3 class="project-title text-xl font-bold text-slate-200 mb-2 transition-colors duration-300">Wi-Fi De-Auth & Beacon Spoofing</h3><p class="text-slate-400 text-sm">Implemented Wi-Fi deauthentication and beacon spoofing attacks using ESP32 to analyze wireless network security vulnerabilities.</p></div><div class="flex flex-wrap gap-2 mt-4 text-xs"><span class="tag px-2 py-1 rounded-full">ESP32</span><span class="tag px-2 py-1 rounded-full">Cybersecurity</span><span class="tag px-2 py-1 rounded-full">Networking</span></div></div>
+                <div class="interactive-card p-6 flex flex-col justify-between"><div><div class="flex justify-between items-center mb-4"><i class="fas fa-folder-open text-3xl text-cyan-400"></i><div class="space-x-4"><a href="#" class="text-slate-400 hover:text-cyan-400"><i class="fab fa-github text-xl"></i></a><a href="#" class="text-slate-400 hover:text-cyan-400"><i class="fas fa-external-link-alt text-xl"></i></a></div></div><h3 class="project-title text-xl font-bold text-slate-200 mb-2 transition-colors duration-300">Speaker Control via Li-Fi</h3><p class="text-slate-400 text-sm">Designed a system to control audio speaker signals using Li-Fi, demonstrating wireless data transmission through visible light.</p></div><div class="flex flex-wrap gap-2 mt-4 text-xs"><span class="tag px-2 py-1 rounded-full">Li-Fi</span><span class="tag px-2 py-1 rounded-full">VLC</span><span class="tag px-2 py-1 rounded-full">Electronics</span></div></div>
+                <div class="interactive-card p-6 flex flex-col justify-between"><div><div class="flex justify-between items-center mb-4"><i class="fas fa-folder-open text-3xl text-cyan-400"></i><div class="space-x-4"><a href="#" class="text-slate-400 hover:text-cyan-400"><i class="fab fa-github text-xl"></i></a><a href="#" class="text-slate-400 hover:text-cyan-400"><i class="fas fa-external-link-alt text-xl"></i></a></div></div><h3 class="project-title text-xl font-bold text-slate-200 mb-2 transition-colors duration-300">Automated Water Supply System</h3><p class="text-slate-400 text-sm">Developed a municipal water supply automation system using Arduino, RTC, and Ultrasonic sensors for real-time monitoring.</p></div><div class="flex flex-wrap gap-2 mt-4 text-xs"><span class="tag px-2 py-1 rounded-full">Arduino</span><span class="tag px-2 py-1 rounded-full">IoT</span><span class="tag px-2 py-1 rounded-full">Automation</span></div></div>
+                <div class="interactive-card p-6 flex flex-col justify-between"><div><div class="flex justify-between items-center mb-4"><i class="fas fa-folder-open text-3xl text-cyan-400"></i><div class="space-x-4"><a href="#" class="text-slate-400 hover:text-cyan-400"><i class="fab fa-github text-xl"></i></a><a href="#" class="text-slate-400 hover:text-cyan-400"><i class="fas fa-external-link-alt text-xl"></i></a></div></div><h3 class="project-title text-xl font-bold text-slate-200 mb-2 transition-colors duration-300">Smart Home Automation</h3><p class="text-slate-400 text-sm">Built an IoT-based smart home system to control lights, fans, and appliances remotely via smartphone.</p></div><div class="flex flex-wrap gap-2 mt-4 text-xs"><span class="tag px-2 py-1 rounded-full">Arduino</span><span class="tag px-2 py-1 rounded-full">IoT</span><span class="tag px-2 py-1 rounded-full">Smart Home</span></div></div>
+                <div class="interactive-card p-6 flex flex-col justify-between"><div><div class="flex justify-between items-center mb-4"><i class="fas fa-folder-open text-3xl text-cyan-400"></i><div class="space-x-4"><a href="#" class="text-slate-400 hover:text-cyan-400"><i class="fab fa-github text-xl"></i></a><a href="#" class="text-slate-400 hover:text-cyan-400"><i class="fas fa-external-link-alt text-xl"></i></a></div></div><h3 class="project-title text-xl font-bold text-slate-200 mb-2 transition-colors duration-300">Traffic Light Control System</h3><p class="text-slate-400 text-sm">Designed a prototype traffic light controller using Arduino and timers to simulate real-world traffic signal logic.</p></div><div class="flex flex-wrap gap-2 mt-4 text-xs"><span class="tag px-2 py-1 rounded-full">Arduino</span><span class="tag px-2 py-1 rounded-full">Simulation</span><span class="tag px-2 py-1 rounded-full">Control System</span></div></div>
+                <div class="interactive-card p-6 flex flex-col justify-between"><div><div class="flex justify-between items-center mb-4"><i class="fas fa-folder-open text-3xl text-cyan-400"></i><div class="space-x-4"><a href="#" class="text-slate-400 hover:text-cyan-400"><i class="fab fa-github text-xl"></i></a><a href="#" class="text-slate-400 hover:text-cyan-400"><i class="fas fa-external-link-alt text-xl"></i></a></div></div><h3 class="project-title text-xl font-bold text-slate-200 mb-2 transition-colors duration-300">DC Motor Speed Control</h3><p class="text-slate-400 text-sm">Implemented PWM using Arduino to vary DC motor speed, demonstrating control applications in automation.</p></div><div class="flex flex-wrap gap-2 mt-4 text-xs"><span class="tag px-2 py-1 rounded-full">Arduino</span><span class="tag px-2 py-1 rounded-full">PWM</span><span class="tag px-2 py-1 rounded-full">Motor Control</span></div></div>
+            </div>
+        </section>
+
+        <section id="toolkit" class="py-24 scroll-fade">
+             <h2 class="section-title text-3xl font-bold text-slate-200 flex items-center"><span class="text-cyan-400 mr-2 text-2xl">05.</span> My Toolkit</h2>
+             <div class="mt-12 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 text-center">
+                 <div class="flex flex-col items-center p-4"><img src="https://img.icons8.com/color/96/000000/arduino.png" alt="Arduino" class="h-16 w-16 mb-2"/><span class="text-sm">Arduino</span></div>
+                 <div class="flex flex-col items-center p-4"><img src="https://img.icons8.com/color/96/000000/raspberry-pi.png" alt="ESP32" class="h-16 w-16 mb-2" style="filter: grayscale(1) brightness(1.5);"/><span class="text-sm">ESP32</span></div>
+                 <div class="flex flex-col items-center p-4 h-full">
+                    <svg class="h-16 w-16 mb-2" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M49.25,85.789,20.317,99.455V28.545L49.25,42.211ZM49.25,46.122,78.183,32.455v63.09L49.25,81.878Z" fill="#F86F07"></path><path d="m78.183,28.545-28.933,13.666L78.183,55.878,107.116,42.211V28.545Z" fill="#F86F07"></path><path d="M78.183,60.211,49.25,46.122V81.878L78.183,95.545V60.211Z" fill="#24A148"></path><path d="M78.183,55.878,49.25,69.545l28.933,13.666L107.116,69.545V55.878Z" fill="#24A148"></path></svg>
+                    <span class="text-sm">MATLAB</span>
+                </div>
+                 <div class="flex flex-col items-center p-4"><i class="fas fa-microchip text-6xl mb-2 text-cyan-400"></i><span class="text-sm">Circuit Design</span></div>
+                 <div class="flex flex-col items-center p-4"><i class="fas fa-network-wired text-6xl mb-2 text-cyan-400"></i><span class="text-sm">Networking</span></div>
+                 <div class="flex flex-col items-center p-4"><i class="fas fa-wifi text-6xl mb-2 text-cyan-400"></i><span class="text-sm">IoT</span></div>
+             </div>
+        </section>
+
+        <section id="achievements" class="py-24 scroll-fade">
+             <h2 class="section-title text-3xl font-bold text-slate-200 flex items-center"><span class="text-cyan-400 mr-2 text-2xl">06.</span> Achievements</h2>
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
+                 <div class="interactive-card p-6 flex items-start space-x-4"><div class="text-cyan-400 text-2xl mt-1"><i class="fas fa-sitemap"></i></div><div><h3 class="font-bold text-slate-200">Leadership & Coordination</h3><p class="text-slate-400 text-sm mt-1">Chief Coordinator of Electro Tech Connect Club and appointed senior in NCC camps.</p></div></div>
+                 <div class="interactive-card p-6 flex items-start space-x-4"><div class="text-cyan-400 text-2xl mt-1"><i class="fas fa-trophy"></i></div><div><h3 class="font-bold text-slate-200">Sports & Teamwork</h3><p class="text-slate-400 text-sm mt-1">Captained the ECE department's Kabaddi team and secured 2nd place in the college-level Kho-Kho tournament.</p></div></div>
+                 <div class="interactive-card p-6 flex items-start space-x-4"><div class="text-cyan-400 text-2xl mt-1"><i class="fas fa-laptop-code"></i></div><div><h3 class="font-bold text-slate-200">Technical Demonstrations</h3><p class="text-slate-400 text-sm mt-1">Demonstrated a Wi-Fi Beacon Spoofing project using ESP32 in front of the DDG NCC.</p></div></div>
+                 <div class="interactive-card p-6 flex items-start space-x-4"><div class="text-cyan-400 text-2xl mt-1"><i class="fas fa-star"></i></div><div><h3 class="font-bold text-slate-200">Active Participation</h3><p class="text-slate-400 text-sm mt-1">Participated in multiple college-level competitions across technical and cultural domains.</p></div></div>
+             </div>
+        </section>
+
+        <section id="contact" class="py-24 text-center scroll-fade">
+            <h2 class="text-xl font-semibold text-cyan-400 mb-2">07. What's Next?</h2>
+            <h3 class="text-5xl font-bold text-slate-200 mb-4">Get In Touch</h3>
+            <p class="max-w-xl mx-auto text-slate-400 mb-8">I'm always open to discussing new projects, creative ideas, or opportunities to be part of an innovative team. Feel free to reach out!</p>
+            <div class="mt-12 flex flex-col md:flex-row items-center justify-center gap-8">
+                 <a href="mailto:chandrayan04@gmail.com" class="border-2 border-cyan-400 text-cyan-400 text-lg px-8 py-4 rounded-md hover:bg-cyan-400/10 transition duration-300">Say Hello</a>
+                 <div class="text-center md:text-left">
+                     <div class="flex items-center gap-4"><i class="fas fa-envelope text-cyan-400"></i><a href="mailto:chandrayan04@gmail.com" class="hover:text-cyan-400">chandrayan04@gmail.com</a></div>
+                     <div class="flex items-center gap-4 mt-2"><i class="fas fa-phone text-cyan-400"></i><a href="tel:+918000149295" class="hover:text-cyan-400">+91 80001 49295</a></div>
+                 </div>
+            </div>
+        </section>
+    </main>
+    
+    <a href="#" id="to-top" class="fixed bottom-8 right-8 z-50 w-12 h-12 rounded-full bg-cyan-400/20 backdrop-blur-sm text-cyan-400 flex items-center justify-center text-2xl opacity-0 pointer-events-none transition-opacity duration-300 hover:bg-cyan-400/40"><i class="fas fa-arrow-up"></i></a>
+
+    <footer class="py-8 text-center text-slate-500 text-sm relative z-10"><p>© 2025 Kushagra Chandrayan | "Unity and Discipline" | Portfolio</p></footer>
+
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.2/vanilla-tilt.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+             // --- Dynamic Background Canvas ---
+            const canvas = document.getElementById('background-canvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            const particleConfig = {
+                count: 50,
+                speed: 0.1,
+                color: 'rgba(100, 255, 218, 0.2)',
+                lineWidth: 1,
+                connectionDistance: 150
+            };
+
+            const componentDrawers = {
+                resistor: (ctx, x, y, size) => {
+                    ctx.beginPath();
+                    ctx.moveTo(x - size, y);
+                    ctx.lineTo(x - size / 1.5, y);
+                    ctx.lineTo(x - size / 2, y - size / 4);
+                    ctx.lineTo(x, y + size / 4);
+                    ctx.lineTo(x + size / 2, y - size / 4);
+                    ctx.lineTo(x + size / 1.5, y);
+                    ctx.lineTo(x + size, y);
+                    ctx.stroke();
+                },
+                capacitor: (ctx, x, y, size) => {
+                    ctx.beginPath();
+                    ctx.moveTo(x - size, y);
+                    ctx.lineTo(x - size / 4, y);
+                    ctx.moveTo(x - size / 4, y - size / 2);
+                    ctx.lineTo(x - size / 4, y + size / 2);
+                    ctx.moveTo(x + size / 4, y - size / 2);
+                    ctx.lineTo(x + size / 4, y + size / 2);
+                    ctx.moveTo(x + size / 4, y);
+                    ctx.lineTo(x + size, y);
+                    ctx.stroke();
+                },
+                diode: (ctx, x, y, size) => {
+                     ctx.beginPath();
+                     ctx.moveTo(x - size, y);
+                     ctx.lineTo(x,y);
+                     ctx.moveTo(x - size/3, y - size/3);
+                     ctx.lineTo(x + size/3, y);
+                     ctx.lineTo(x-size/3, y + size/3);
+                     ctx.closePath();
+                     ctx.moveTo(x + size/3, y-size/3);
+                     ctx.lineTo(x+size/3, y+size/3);
+                     ctx.moveTo(x,y);
+                     ctx.lineTo(x+size,y);
+                     ctx.stroke();
+                }
+            };
+            const componentTypes = Object.keys(componentDrawers);
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * particleConfig.speed;
+                    this.vy = (Math.random() - 0.5) * particleConfig.speed;
+                    this.size = Math.random() * 10 + 15;
+                    this.type = componentTypes[Math.floor(Math.random() * componentTypes.length)];
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                }
+                draw() {
+                    componentDrawers[this.type](ctx, this.x, this.y, this.size);
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                for (let i = 0; i < particleConfig.count; i++) {
+                    particles.push(new Particle());
+                }
+            }
+
+            function connectParticles() {
+                for (let i = 0; i < particles.length; i++) {
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        if (distance < particleConfig.connectionDistance) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(100, 255, 218, ${1 - distance / particleConfig.connectionDistance * 0.5})`;
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = particleConfig.color;
+                ctx.lineWidth = particleConfig.lineWidth;
+                particles.forEach(p => {
+                    p.update();
+                    p.draw();
+                });
+                connectParticles();
+                requestAnimationFrame(animate);
+            }
+            initParticles();
+            animate();
+
+
+            // --- Custom Cursor ---
+            const cursor = document.querySelector('.cursor');
+            const cursorDot = document.querySelector('.cursor-dot');
+            window.addEventListener('mousemove', e => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+                cursorDot.style.left = e.clientX + 'px';
+                cursorDot.style.top = e.clientY + 'px';
+            });
+             document.addEventListener('click', e => {
+                const splash = document.createElement('div');
+                splash.style.position = 'fixed';
+                splash.style.left = e.clientX + 'px';
+                splash.style.top = e.clientY + 'px';
+                splash.style.width = '20px';
+                splash.style.height = '20px';
+                splash.style.border = '2px solid var(--cyan)';
+                splash.style.borderRadius = '50%';
+                splash.style.pointerEvents = 'none';
+                splash.style.transform = 'translate(-50%, -50%)';
+                splash.style.zIndex = '10002';
+                document.body.appendChild(splash);
+
+                splash.animate([
+                    { width: '20px', height: '20px', opacity: 1 },
+                    { width: '80px', height: '80px', opacity: 0 }
+                ], {
+                    duration: 500,
+                    easing: 'ease-out'
+                }).onfinish = () => splash.remove();
+            });
+
+
+            // --- Pixel Transition ---
+            const pixelContainers = document.querySelectorAll('.pixel-transition-container');
+            pixelContainers.forEach(container => {
+                const overlay = container.querySelector('.pixel-overlay');
+                if (!overlay) return;
+                for (let i = 0; i < 144; i++) {
+                    const pixel = document.createElement('div');
+                    pixel.classList.add('pixel');
+                    pixel.style.transitionDelay = `${Math.random() * 0.4}s`;
+                    overlay.appendChild(pixel);
+                }
+            });
+
+
+            // --- Text Scramble Effect ---
+            class TextScramble {
+                constructor(el) {
+                    this.el = el;
+                    this.chars = '!<>-_\\/[]{}—=+*^?#________';
+                    this.update = this.update.bind(this);
+                }
+                setText(newText) {
+                    const oldText = this.el.innerText;
+                    const length = Math.max(oldText.length, newText.length);
+                    const promise = new Promise((resolve) => this.resolve = resolve);
+                    this.queue = [];
+                    for (let i = 0; i < length; i++) {
+                        const from = oldText[i] || '';
+                        const to = newText[i] || '';
+                        const start = Math.floor(Math.random() * 40);
+                        const end = start + Math.floor(Math.random() * 40);
+                        this.queue.push({ from, to, start, end });
+                    }
+                    cancelAnimationFrame(this.frameRequest);
+                    this.frame = 0;
+                    this.update();
+                    return promise;
+                }
+                update() {
+                    let output = '';
+                    let complete = 0;
+                    for (let i = 0, n = this.queue.length; i < n; i++) {
+                        let { from, to, start, end, char } = this.queue[i];
+                        if (this.frame >= end) {
+                            complete++;
+                            output += to;
+                        } else if (this.frame >= start) {
+                            if (!char || Math.random() < 0.28) {
+                                char = this.randomChar();
+                                this.queue[i].char = char;
+                            }
+                            output += `<span class="scramble">${char}</span>`;
+                        } else {
+                            output += from;
+                        }
+                    }
+                    this.el.innerHTML = output;
+                    if (complete === this.queue.length) {
+                        this.resolve();
+                    } else {
+                        this.frameRequest = requestAnimationFrame(this.update);
+                        this.frame++;
+                    }
+                }
+                randomChar() {
+                    return this.chars[Math.floor(Math.random() * this.chars.length)];
+                }
+            }
+
+
+            if (typeof VanillaTilt !== 'undefined') {
+                VanillaTilt.init(document.querySelectorAll(".interactive-card"), { max: 8, speed: 400, glare: true, "max-glare": 0.1 });
+            }
+
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('#nav-links .nav-link');
+            const scrambleElements = document.querySelectorAll('[data-scramble-text]');
+            const scrambleEffects = new Map();
+            scrambleElements.forEach(el => {
+                scrambleEffects.set(el, new TextScramble(el));
+                el.dataset.originalText = el.textContent;
+                el.textContent = '';
+            });
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    const id = entry.target.getAttribute('id');
+                    const navLink = document.querySelector(`#nav-links .nav-link[href="#${id}"]`);
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        navLinks.forEach(link => link.classList.remove('active'));
+                        if (navLink) { navLink.classList.add('active'); }
+                        
+                        if (id === 'about') {
+                            scrambleElements.forEach(el => {
+                                scrambleEffects.get(el).setText(el.dataset.originalText);
+                            });
+                        }
+                    }
+                });
+            }, { threshold: 0.5 });
+            sections.forEach(section => observer.observe(section));
+
+            const typedTextSpan = document.getElementById('typed-text');
+            const textArray = ["Embedded Systems.", "IoT Solutions.", "Innovative Circuits.", "Creative Things."];
+            let textArrayIndex = 0, charIndex = 0;
+            function type() { if (charIndex < textArray[textArrayIndex].length) { typedTextSpan.textContent += textArray[textArrayIndex].charAt(charIndex++); setTimeout(type, 100); } else { setTimeout(erase, 2000); } }
+            function erase() { if (charIndex > 0) { typedTextSpan.textContent = textArray[textArrayIndex].substring(0, --charIndex); setTimeout(erase, 50); } else { textArrayIndex = (textArrayIndex + 1) % textArray.length; setTimeout(type, 600); } }
+            
+            const preloader = document.getElementById('preloader');
+            window.addEventListener('load', () => {
+                preloader.style.opacity = '0';
+                setTimeout(() => {
+                    preloader.style.display = 'none';
+                    if (textArray.length) setTimeout(type, 500);
+                }, 500);
+            });
+
+            const toTopButton = document.getElementById('to-top');
+            window.addEventListener('scroll', () => { window.scrollY > 300 ? toTopButton.classList.remove('opacity-0', 'pointer-events-none') : toTopButton.classList.add('opacity-0', 'pointer-events-none'); });
+            toTopButton.addEventListener('click', (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+        });
+    </script>
+</body>
+</html>
+
